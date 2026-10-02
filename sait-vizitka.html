@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Студия «Ольха» — маникюр и педикюр</title>
+<meta name="description" content="Студия ногтевого сервиса. Запись онлайн, цены, адрес.">
+<style>
+:root{--bg:#0e0e0e;--fg:#f4f1ea;--pink:#ff3d7f;--mut:#9a968c;--card:#181818}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.55 "Segoe UI",Helvetica,Arial,sans-serif}
+a{color:inherit}
+header{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;background:rgba(14,14,14,.92);border-bottom:1px solid #2a2a2a}
+.logo{font:700 22px Georgia,serif;letter-spacing:.5px}
+.logo i{color:var(--pink);font-style:normal}
+nav a{margin-left:22px;text-decoration:none;font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut)}
+nav a:hover{color:var(--fg)}
+.btn{display:inline-block;background:var(--pink);color:#fff;text-decoration:none;padding:15px 28px;font-weight:700;letter-spacing:.5px;border:0;cursor:pointer;font-size:16px}
+.btn:hover{background:#ff1f6b}
+.hero{padding:9vw 5vw 6vw;display:grid;grid-template-columns:1.3fr 1fr;gap:5vw;align-items:end;border-bottom:1px solid #2a2a2a}
+.hero h1{font:400 clamp(48px,9vw,128px)/.92 Georgia,"Times New Roman",serif;margin:0;letter-spacing:-2px}
+.hero h1 em{color:var(--pink)}
+.hero p{color:var(--mut);max-width:380px}
+section{padding:6vw 5vw;border-bottom:1px solid #2a2a2a}
+h2{font:400 clamp(30px,5vw,56px)/1 Georgia,serif;margin:0 0 30px}
+.price{display:flex;align-items:baseline;gap:12px;padding:18px 0;border-bottom:1px solid #2a2a2a}
+.price b{font-weight:600}
+.price span.dots{flex:1;border-bottom:1px dotted #444;transform:translateY(-5px)}
+.price span.t{color:var(--mut);font-size:14px}
+.price strong{font:700 20px Georgia,serif;color:var(--pink)}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--card);padding:26px}
+.card h3{margin:0 0 8px;font:400 24px Georgia,serif}
+.card p{margin:0;color:var(--mut);font-size:15px}
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:5vw}
+form{display:grid;gap:12px}
+input,select{background:var(--card);border:1px solid #333;color:var(--fg);padding:14px;font:inherit}
+.res{display:none;padding:14px;background:#1d2b1d;color:#bff0bf;margin-top:6px}
+.res.err{background:#331818;color:#ffb3b3}
+footer{padding:30px 5vw;color:var(--mut);font-size:14px}
+.demo{position:fixed;left:0;bottom:0;background:var(--pink);color:#fff;font-size:12px;padding:5px 10px;z-index:9}
+@media(max-width:800px){.hero,.contact,.cols{grid-template-columns:1fr}nav{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Ольха<i>.</i></div>
+  <nav><a href="#uslugi">Услуги</a><a href="#masters">Мастера</a><a href="#zapis">Запись</a></nav>
+</header>
+
+<div class="hero">
+  <h1>Руки,<br>которым<br><em>доверяют</em></h1>
+  <div>
+    <p>Маникюр, педикюр и уход за руками в центре города. Работаем с 10 до 20 без выходных. Одноразовые инструменты, стерилизация на ваших глазах.</p>
+    <a class="btn" href="#zapis">Записаться</a>
+  </div>
+</div>
+
+<section id="uslugi">
+  <h2>Услуги и цены</h2>
+  <div id="prices"></div>
+</section>
+
+<section id="masters">
+  <h2>Мастера</h2>
+  <div class="cols">
+    <div class="card"><h3>Анна</h3><p>Маникюр, укрепление, дизайн. Принимает по вторникам, четвергам и субботам.</p></div>
+    <div class="card"><h3>Мария</h3><p>Педикюр, аппаратная обработка. Принимает ежедневно, кроме воскресенья.</p></div>
+    <div class="card"><h3>Ольга</h3><p>Покрытие, снятие, коррекция. Принимает со среды по воскресенье.</p></div>
+  </div>
+</section>
+
+<section id="zapis">
+  <h2>Записаться</h2>
+  <div class="contact">
+    <form id="f">
+      <select id="svc"></select>
+      <input id="date" type="date">
+      <select id="time"></select>
+      <input id="name" type="text" placeholder="Ваше имя">
+      <input id="phone" type="tel" placeholder="Телефон">
+      <button class="btn" type="submit">Отправить заявку</button>
+      <div class="res" id="res"></div>
+    </form>
+    <div>
+      <p style="margin-top:0"><b>Адрес.</b><br>г. Брянск, ул. Примерная, 1 (демо-адрес)</p>
+      <p><b>Телефон.</b><br>+7 000 000-00-00</p>
+      <p><b>Часы работы.</b><br>10:00–20:00 без выходных</p>
+      <p style="color:var(--mut);font-size:14px">В рабочей версии заявка приходит вам в Telegram, а клиент получает подтверждение. Занятое время скрывается из списка автоматически.</p>
+    </div>
+  </div>
+</section>
+
+<footer>© Студия «Ольха». Демонстрационный сайт: названия, цены и контакты условные.</footer>
+<div class="demo">демо-сайт</div>
+
+<script>
+const SERVICES=[
+ ['Маникюр классический','1 ч',1200],['Маникюр + покрытие гель-лак','2 ч',2200],
+ ['Педикюр аппаратный','1,5 ч',2600],['Педикюр + покрытие','2 ч',3200],
+ ['Снятие покрытия','30 мин',500],['Дизайн (1 ноготь)','10 мин',150]];
+const fmt=n=>n.toLocaleString('ru-RU');
+document.getElementById('prices').innerHTML=SERVICES.map(s=>`<div class="price"><b>${s[0]}</b><span class="dots"></span><span class="t">${s[1]}</span><strong>${fmt(s[2])} ₽</strong></div>`).join('');
+const svc=document.getElementById('svc');svc.innerHTML='<option value="">Выберите услугу</option>'+SERVICES.map((s,i)=>`<option value="${i}">${s[0]} — ${fmt(s[2])} ₽</option>`).join('');
+const date=document.getElementById('date');const today=new Date();date.min=today.toISOString().slice(0,10);date.value=date.min;
+const time=document.getElementById('time');
+function times(){const taken=(date.value.charCodeAt(9)||0)%3;const hrs=[];for(let h=10;h<20;h++){if(h%3===taken)continue;hrs.push(h)}time.innerHTML=hrs.map(h=>`<option>${h}:00</option>`).join('')}
+date.onchange=times;times();
+document.getElementById('f').onsubmit=e=>{e.preventDefault();const r=document.getElementById('res');r.style.display='block';
+ const n=document.getElementById('name').value.trim(),p=document.getElementById('phone').value.replace(/\D/g,'');
+ if(svc.value===''||!n||p.length<10){r.className='res err';r.textContent='Выберите услугу, укажите имя и телефон.';return}
+ r.className='res';r.textContent=`Заявка принята: ${SERVICES[svc.value][0]}, ${date.value}, ${time.value}. Мы свяжемся для подтверждения.`};
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Меню — кофейня «Зерно»</title>
+<style>
+:root{--y:#ffd23f;--g:#1f7a4d;--ink:#1b1b1b;--bg:#fffdf5;--line:#ece6d0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Trebuchet MS","Segoe UI",sans-serif;padding-bottom:90px}
+.top{background:var(--y);padding:22px 16px 16px;border-bottom:4px solid var(--ink)}
+.top h1{margin:0;font:900 32px/1 "Arial Black",sans-serif;letter-spacing:-1px}
+.top p{margin:6px 0 0;font-size:14px}
+.search{margin:12px 0 0;width:100%;border:3px solid var(--ink);padding:11px 12px;font:inherit;background:#fff;border-radius:12px}
+.tabs{position:sticky;top:0;display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:var(--bg);border-bottom:2px solid var(--line);z-index:3}
+.tabs button{flex:none;border:2px solid var(--ink);background:#fff;padding:7px 14px;border-radius:99px;font:700 14px inherit;cursor:pointer}
+.tabs button.on{background:var(--ink);color:#fff}
+.cat{padding:6px 12px}
+.cat h2{margin:18px 0 6px;font:900 22px "Arial Black",sans-serif}
+.item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px dashed var(--line)}
+.ph{flex:none;width:58px;height:58px;border-radius:14px;display:grid;place-items:center;font-size:30px;border:2px solid var(--ink)}
+.info{flex:1}
+.info b{display:block}
+.info small{color:#6a6a5f}
+.tag{display:inline-block;background:var(--g);color:#fff;font-size:11px;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.pr{font:900 17px "Arial Black",sans-serif;white-space:nowrap}
+.q{display:flex;align-items:center;gap:8px;margin-top:6px}
+.q button{width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);background:#fff;font:900 18px/1 sans-serif;cursor:pointer}
+.q span{min-width:18px;text-align:center;font-weight:700}
+.bar{position:fixed;left:12px;right:12px;bottom:12px;background:var(--ink);color:#fff;border-radius:16px;padding:14px 16px;display:none;justify-content:space-between;align-items:center;z-index:5;cursor:pointer}
+.bar b{font:900 18px "Arial Black",sans-serif}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:9}
+.sheet>div{background:#fff;width:100%;max-height:80vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px}
+.sheet h3{margin:0 0 10px;font:900 22px "Arial Black",sans-serif}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.sheet button.go{width:100%;margin-top:14px;background:var(--g);color:#fff;border:0;padding:15px;border-radius:14px;font:900 16px inherit;cursor:pointer}
+.sheet input{width:100%;margin-top:12px;padding:12px;border:2px solid var(--ink);border-radius:12px;font:inherit}
+.demo{position:fixed;top:0;right:0;background:var(--ink);color:#fff;font-size:11px;padding:3px 8px;z-index:20}
+</style>
+</head>
+<body>
+<div class="demo">демо</div>
+<div class="top"><h1>Кофейня «Зерно»</h1><p>Стол № 7 · Меню по QR-коду</p>
+<input class="search" id="q" placeholder="Найти блюдо или напиток"></div>
+<div class="tabs" id="tabs"></div>
+<div id="menu"></div>
+<div class="bar" id="bar"><span id="cnt"></span><b id="tot"></b></div>
+<div class="sheet" id="sheet"><div id="sc"></div></div>
+<script>
+const MENU=[
+ {c:'Кофе',e:'☕',bg:'#f2d9b8',items:[['Эспрессо','30 мл',120],['Американо','200 мл',150],['Капучино','250 мл',210,'хит'],['Латте','300 мл',230],['Раф ванильный','300 мл',270],['Флэт уайт','180 мл',240]]},
+ {c:'Чай',e:'🍵',bg:'#cfe8c9',items:[['Чёрный с бергамотом','500 мл',190],['Зелёный сенча','500 мл',190],['Облепиховый','500 мл',240,'тепло']]},
+ {c:'Десерты',e:'🍰',bg:'#f7c6d3',items:[['Чизкейк','130 г',260,'хит'],['Брауни','90 г',190],['Круассан миндальный','110 г',210],['Тирамису','140 г',280]]},
+ {c:'Завтраки',e:'🍳',bg:'#ffe08a',items:[['Сырники со сметаной','3 шт',290],['Омлет с овощами','220 г',320],['Гранола с йогуртом','250 г',260]]}
+];
+const cart={};let q='';
+const $=s=>document.querySelector(s),fmt=n=>n.toLocaleString('ru-RU')+' ₽';
+const key=(ci,ii)=>ci+'_'+ii;
+function render(){
+ const box=$('#menu');box.innerHTML='';
+ MENU.forEach((c,ci)=>{
+  const its=c.items.map((it,ii)=>[it,ii]).filter(([it])=>!q||it[0].toLowerCase().includes(q));
+  if(!its.length)return;
+  const s=document.createElement('div');s.className='cat';s.id='c'+ci;
+  s.innerHTML='<h2>'+c.c+'</h2>'+its.map(([it,ii])=>{const k=key(ci,ii),n=cart[k]||0;
+   return `<div class="item"><div class="ph" style="background:${c.bg}">${c.e}</div><div class="info"><b>${it[0]}${it[3]?'<span class="tag">'+it[3]+'</span>':''}</b><small>${it[1]}</small>
+   <div class="q"><button data-k="${k}" data-d="-1">−</button><span>${n}</span><button data-k="${k}" data-d="1">+</button></div></div><div class="pr">${fmt(it[2])}</div></div>`}).join('');
+  box.append(s)});
+ box.querySelectorAll('.q button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;cart[k]=Math.max(0,(cart[k]||0)+ +b.dataset.d);render();bar()});
+}
+function total(){let n=0,s=0;MENU.forEach((c,ci)=>c.items.forEach((it,ii)=>{const k=cart[key(ci,ii)]||0;n+=k;s+=k*it[2]}));return[n,s]}
+function bar(){const[n,s]=total();const b=$('#bar');b.style.display=n?'flex':'none';$('#cnt').textContent='Заказ: '+n+' поз.';$('#tot').textContent=fmt(s)}
+$('#tabs').innerHTML=MENU.map((c,i)=>`<button data-i="${i}" class="${i?'':'on'}">${c.e} ${c.c}</button>`).join('');
+$('#tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('#tabs').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');const el=$('#c'+b.dataset.i);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})});
+$('#q').oninput=e=>{q=e.target.value.trim().toLowerCase();render()};
+$('#bar').onclick=()=>{
+ const rows=[];MENU.forEach((c,ci)=>c.items.forEach((it,ii)=>{const k=cart[key(ci,ii)]||0;if(k)rows.push(`<div class="row"><span>${it[0]} × ${k}</span><b>${fmt(k*it[2])}</b></div>`)}));
+ $('#sc').innerHTML='<h3>Ваш заказ, стол 7</h3>'+rows.join('')+`<div class="row"><b>Итого</b><b>${fmt(total()[1])}</b></div><input id="cm" placeholder="Комментарий (необязательно)"><button class="go" id="go">Отправить официанту</button><div id="done" style="margin-top:10px;color:#1f7a4d;font-weight:700"></div>`;
+ $('#sheet').style.display='flex';
+ $('#go').onclick=()=>{$('#done').textContent='Заказ отправлен. В рабочей версии он сразу приходит официанту или на кухню в Telegram.';};
+};
+$('#sheet').onclick=e=>{if(e.target.id==='sheet')$('#sheet').style.display='none'};
+render();bar();
+</script>
+</body>
+</html>

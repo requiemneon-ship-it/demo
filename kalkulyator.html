@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Расчёт стоимости натяжных потолков</title>
+<style>
+:root{--ink:#111;--paper:#f2f2ee;--line:#111;--hot:#ff4d00;--mut:#6b6b66}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 "Arial Narrow","Segoe UI",Arial,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+h1{font:900 clamp(34px,7vw,64px)/.95 "Arial Black",Impact,sans-serif;letter-spacing:-1.5px;text-transform:uppercase;margin:0 0 6px}
+h1 span{background:var(--hot);color:#fff;padding:0 .12em}
+.sub{margin:0 0 26px;color:var(--mut);max-width:560px}
+.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:0;border:3px solid var(--line)}
+.col{padding:22px}
+.col+.col{border-left:3px solid var(--line);background:#fff}
+label.t{display:block;font:800 12px/1 "Arial Black",Arial,sans-serif;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 8px}
+.f{margin-bottom:20px}
+.rooms .r{border:2px solid var(--line);padding:12px;margin-bottom:10px;background:var(--paper);position:relative}
+.rooms .r b{font:800 13px "Arial Black";text-transform:uppercase}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.row>div{flex:1 1 90px}
+input[type=number],select,input[type=text],input[type=tel]{width:100%;font:inherit;padding:10px;border:2px solid var(--line);background:#fff;border-radius:0}
+.seg{display:flex;border:2px solid var(--line)}
+.seg button{flex:1;border:0;background:#fff;padding:11px 6px;font:700 14px inherit;cursor:pointer;border-right:2px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:#fff}
+.add{border:2px dashed var(--line);background:transparent;padding:12px;width:100%;font:800 13px "Arial Black";text-transform:uppercase;cursor:pointer}
+.del{position:absolute;right:8px;top:8px;border:0;background:none;font-size:20px;cursor:pointer}
+.sum{font:900 clamp(44px,8vw,72px)/1 "Arial Black",Impact,sans-serif;letter-spacing:-2px}
+.sum small{font-size:.4em;letter-spacing:0}
+.lines{margin:14px 0;border-top:2px solid var(--line)}
+.lines div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #d6d6d0;font-size:14px}
+.cta{width:100%;background:var(--hot);color:#fff;border:0;padding:16px;font:900 16px "Arial Black";text-transform:uppercase;letter-spacing:1px;cursor:pointer;margin-top:6px}
+.cta:hover{background:#e04400}
+.note{font-size:12px;color:var(--mut);margin-top:12px}
+.ok{display:none;background:var(--ink);color:#fff;padding:14px;margin-top:12px}
+.demo{position:fixed;right:0;bottom:0;background:var(--ink);color:#fff;font-size:12px;padding:6px 10px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.col+.col{border-left:0;border-top:3px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Потолок<br>за <span>минуту</span></h1>
+  <p class="sub">Укажите комнаты и размеры, увидите цену сразу. Без звонка и ожидания замерщика, чтобы понять порядок цифр.</p>
+  <div class="grid">
+    <div class="col">
+      <div class="f"><label class="t">Полотно</label>
+        <div class="seg" id="seg-type"></div></div>
+      <div class="f"><label class="t">Комнаты</label>
+        <div class="rooms" id="rooms"></div>
+        <button class="add" id="addRoom">+ добавить комнату</button></div>
+      <div class="f"><label class="t">Светильники, шт.</label><input type="number" id="spots" min="0" value="4"></div>
+      <div class="f"><label class="t">Люстра (крепление)</label>
+        <div class="seg" id="seg-chand"></div></div>
+      <div class="f"><label class="t">Подсветка по периметру (парящий)</label>
+        <div class="seg" id="seg-float"></div></div>
+    </div>
+    <div class="col">
+      <label class="t">Примерная стоимость</label>
+      <div class="sum" id="sum">0 <small>₽</small></div>
+      <div id="area" class="sub" style="margin:4px 0 0"></div>
+      <div class="lines" id="lines"></div>
+      <label class="t" style="margin-top:18px">Хочу точный расчёт</label>
+      <div class="f"><input type="text" id="name" placeholder="Имя"></div>
+      <div class="f"><input type="tel" id="phone" placeholder="Телефон"></div>
+      <button class="cta" id="send">Отправить заявку</button>
+      <div class="ok" id="ok"></div>
+      <p class="note">Цены в этом примере условные. На вашем сайте будут ваши цены, ваши типы работ и заявки придут вам в Telegram.</p>
+    </div>
+  </div>
+</div>
+<div class="demo">демо-версия</div>
+<script>
+// Условный прайс. На реальном сайте подставляются цены заказчика.
+const TYPES=[{id:'mat',name:'Матовое',p:550},{id:'glo',name:'Глянцевое',p:620},{id:'sat',name:'Сатин',p:690}];
+const CHAND=[{id:'no',name:'Нет',p:0},{id:'yes',name:'Да',p:450}];
+const FLOAT=[{id:'no',name:'Нет',p:0},{id:'yes',name:'Да',p:900}]; // за погонный метр периметра
+const SPOT=380, CORNER=60, MIN=3500;
+let state={type:'mat',chand:'no',float:'no',rooms:[{name:'Гостиная',w:4,l:5}]};
+const $=s=>document.querySelector(s);
+const fmt=n=>Math.round(n).toLocaleString('ru-RU');
+function seg(el,list,key){
+  el.innerHTML='';list.forEach(o=>{const b=document.createElement('button');b.textContent=o.name;b.className=state[key]===o.id?'on':'';
+    b.onclick=()=>{state[key]=o.id;seg(el,list,key);calc()};el.append(b)});
+}
+function drawRooms(){
+  const box=$('#rooms');box.innerHTML='';
+  state.rooms.forEach((r,i)=>{
+    const d=document.createElement('div');d.className='r';
+    d.innerHTML=`<b>Комната ${i+1}</b>${state.rooms.length>1?'<button class="del" title="Убрать">×</button>':''}
+      <div class="row"><div><label class="t">Ширина, м</label><input type="number" step="0.1" min="0.5" value="${r.w}" data-k="w"></div>
+      <div><label class="t">Длина, м</label><input type="number" step="0.1" min="0.5" value="${r.l}" data-k="l"></div></div>`;
+    d.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{r[inp.dataset.k]=parseFloat(inp.value)||0;calc()});
+    const del=d.querySelector('.del');if(del)del.onclick=()=>{state.rooms.splice(i,1);drawRooms();calc()};
+    box.append(d);
+  });
+}
+function calc(){
+  const t=TYPES.find(x=>x.id===state.type), ch=CHAND.find(x=>x.id===state.chand), fl=FLOAT.find(x=>x.id===state.float);
+  let area=0,per=0;state.rooms.forEach(r=>{area+=r.w*r.l;per+=2*(r.w+r.l)});
+  const spots=Math.max(0,parseInt($('#spots').value)||0);
+  const lines=[
+    ['Полотно '+t.name.toLowerCase()+', '+area.toFixed(1)+' м²', area*t.p],
+    ['Периметр и углы (4 шт. на комнату)', state.rooms.length*4*CORNER],
+    ['Светильники × '+spots, spots*SPOT]
+  ];
+  if(ch.p)lines.push(['Крепление люстры',ch.p*state.rooms.length]);
+  if(fl.p)lines.push(['Парящий профиль с подсветкой, '+per.toFixed(1)+' м',per*fl.p]);
+  let total=lines.reduce((s,l)=>s+l[1],0);
+  if(total<MIN&&area>0){lines.push(['Минимальный заказ',MIN-total]);total=MIN}
+  $('#sum').innerHTML=fmt(total)+' <small>₽</small>';
+  $('#area').textContent='Площадь '+area.toFixed(1)+' м², периметр '+per.toFixed(1)+' м';
+  $('#lines').innerHTML=lines.map(l=>`<div><span>${l[0]}</span><b>${fmt(l[1])} ₽</b></div>`).join('');
+  window.__total=total;
+}
+$('#addRoom').onclick=()=>{state.rooms.push({name:'Комната',w:3,l:3});drawRooms();calc()};
+$('#spots').oninput=calc;
+$('#send').onclick=()=>{
+  const n=$('#name').value.trim(),p=$('#phone').value.replace(/\D/g,'');
+  const ok=$('#ok');ok.style.display='block';
+  if(!n||p.length<10){ok.style.background='#b00020';ok.textContent='Укажите имя и телефон (10+ цифр).';return}
+  ok.style.background='#111';ok.textContent='Заявка принята: '+n+', расчёт на '+fmt(window.__total)+' ₽. В рабочей версии она сразу приходит вам в Telegram.';
+};
+seg($('#seg-type'),TYPES,'type');seg($('#seg-chand'),CHAND,'chand');seg($('#seg-float'),FLOAT,'float');drawRooms();calc();
+</script>
+</body>
+</html>
